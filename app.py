@@ -96,7 +96,7 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
         elements.append(Image("WidgetHeader.png", width=500, height=80))
         elements.append(Spacer(1, 12))
 
-    report_date = datetime.now().strftime("Report Date: %B %d, %Y at %I:%M %p")
+    report_date = datetime.now().astimezone().strftime("Report Date: %B %d, %Y at %I:%M %p")
     elements.append(Paragraph(report_date, date_style))
     elements.append(Spacer(1, 24))
 
@@ -198,7 +198,8 @@ if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
 # Format current date and time for filename
-now_str = datetime.now().strftime("%Y-%m-%d")
+now_str = datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M")
+
 
 
 # Print and download PDF with timestamped filename
