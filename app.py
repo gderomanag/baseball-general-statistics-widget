@@ -201,7 +201,7 @@ if pitching_sort != "None":
 
 # Format current date and time for filename
 now = datetime.now(ZoneInfo("America/New_York"))
-now_str = now.strftime("%Y-%m-%d_%H:%M")
+now_str = now.strftime("%Y-%m-%d_%H-%M")
 
 
 
