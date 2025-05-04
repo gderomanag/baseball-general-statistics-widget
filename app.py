@@ -7,6 +7,7 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
+from io import BytesIO
 
 # Pointstreak API Setup
 API_KEY = "KEY"
@@ -83,7 +84,8 @@ def clean_fielding_df(df):
     return df[[col for col in order if col in df.columns] + [col for col in df.columns if col not in order]]
 
 def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding_filters, pitching_filters):
-    doc = SimpleDocTemplate("stats_report.pdf", pagesize=LETTER)
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=LETTER)
     elements = []
     styles = getSampleStyleSheet()
     custom_title_style = ParagraphStyle(name="CustomTitle", parent=styles['Title'], textColor=colors.HexColor("#000c66"), fontSize=14, alignment=1)
@@ -124,6 +126,9 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
     add_title_and_table("Fielding Stats", fielding_df, fielding_filters)
     add_title_and_table("Pitching Stats", pitching_df, pitching_filters)
     doc.build(elements)
+
+    buffer.seek(0)
+    return buffer
 
 # Load and clean data
 batting_data = clean_batting_df(get_batting_stats(SEASON_ID))
@@ -193,14 +198,20 @@ if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
 # Print and generate PDF
-if st.button("🖨️ Print"):
-    generate_pdf(
+if st.button("🖨️ Generate PDF"):
+    pdf_buffer = generate_pdf(
         batting_filtered, fielding_filtered, pitching_filtered,
         batting_filters=(batting_team, batting_player, batting_sort),
         fielding_filters=(fielding_team, fielding_player, fielding_sort),
         pitching_filters=(pitching_team, pitching_player, pitching_sort)
     )
-    st.success("PDF generated successfully: stats_report.pdf")
+    st.download_button(
+        label="📥 Download PDF",
+        data=pdf_buffer,
+        file_name="stats_report.pdf",
+        mime="application/pdf"
+    )
+
 
 # Show filtered tables
 col1.dataframe(batting_filtered, use_container_width=True)
