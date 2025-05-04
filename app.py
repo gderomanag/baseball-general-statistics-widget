@@ -197,7 +197,10 @@ if pitching_player != "All":
 if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
-# Print and generate PDF
+# Format current date and time for filename
+now_str = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+# Print and download PDF with timestamped filename
 st.download_button(
     label="🖨️ Generate and Download PDF",
     data=generate_pdf(
@@ -206,9 +209,10 @@ st.download_button(
         fielding_filters=(fielding_team, fielding_player, fielding_sort),
         pitching_filters=(pitching_team, pitching_player, pitching_sort)
     ),
-    file_name="stats_report.pdf",
+    file_name=f"stats_report_{now_str}.pdf",
     mime="application/pdf"
 )
+
 
 
 # Show filtered tables
