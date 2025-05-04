@@ -1,3 +1,25 @@
+"""
+Baseball Performance Widget
+---------------------------
+This Streamlit app pulls player statistics from the Pointstreak API for a given baseball season and displays
+batting, fielding, and pitching data with filtering capabilities. The user can generate and download a PDF
+report summarizing the top filtered results.
+
+Main Features:
+- Interactive UI with team/player/sort filters for batting, fielding, and pitching.
+- Pulls and cleans data from Pointstreak's public API.
+- Displays data tables using Streamlit and generates a stylized PDF report.
+- Handles time zones and ensures report filenames are timestamped appropriately.
+
+Dependencies:
+- streamlit, pandas, requests, reportlab, zoneinfo
+"""
+
+# -------------------------
+# Imports and Configuration
+# -------------------------
+
+# Core libraries
 import streamlit as st
 import pandas as pd
 import requests
@@ -10,28 +32,50 @@ import os
 from io import BytesIO
 from zoneinfo import ZoneInfo
 
+# -------------------
 # Pointstreak API Setup
+# -------------------
+
 API_KEY = "KEY"
 BASE_URL = "https://api.pointstreak.com"
 HEADERS = {"apikey": API_KEY}
 SEASON_ID = 34052
 
-# Helper functions
+# -------------------
+# API Fetch Function
+# -------------------
+
 def fetch(endpoint):
+    """
+    Fetch JSON data from the Pointstreak API.
+
+    Args:
+        endpoint (str): The API endpoint path.
+
+    Returns:
+        dict: JSON response parsed into Python dictionary.
+    """
     url = f"{BASE_URL}/{endpoint}"
     response = requests.get(url, headers=HEADERS)
     response.raise_for_status()
     return response.json()
 
+# ---------------------------
+# Data Retrieval Functions
+# ---------------------------
+
 def get_batting_stats(season_id):
+    """Fetch and return raw batting stats as a DataFrame."""
     data = fetch(f"baseball/season/stats/{season_id}/json")
     return pd.DataFrame(data.get("stats", {}).get("batting", {}).get("player", []))
 
 def get_pitching_stats(season_id):
+    """Fetch and return raw pitching stats as a DataFrame."""
     data = fetch(f"baseball/season/stats/{season_id}/json")
     return pd.DataFrame(data.get("stats", {}).get("pitching", {}).get("player", []))
 
 def get_fielding_stats(season_id):
+    """Fetch and return raw fielding stats as a DataFrame."""
     data = fetch(f"baseball/season/fieldingleaders/{season_id}/json")
     players = []
     for position in data.get("stats", {}).get("position", []):
@@ -42,7 +86,12 @@ def get_fielding_stats(season_id):
                 players.append(player)
     return pd.DataFrame(players)
 
+# ------------------------
+# Data Cleaning Functions
+# ------------------------
+
 def clean_batting_df(df):
+    """Clean and structure batting stats DataFrame."""
     if "teamname" in df.columns:
         df["teamname"] = df["teamname"].apply(lambda x: x.get("$t") if isinstance(x, dict) else x)
     df = df.drop(columns=[col for col in ["playerlinkid", "playerid", "firstname", "lastname"] if col in df.columns])
@@ -57,6 +106,7 @@ def clean_batting_df(df):
     return df[[col for col in order if col in df.columns] + [col for col in df.columns if col not in order]]
 
 def clean_pitching_df(df):
+    """Clean and structure pitching stats DataFrame."""
     if "teamname" in df.columns:
         df["teamname"] = df["teamname"].apply(lambda x: x.get("$t") if isinstance(x, dict) else x)
     df = df.drop(columns=[col for col in ["playerlinkid", "playerid", "firstname", "lastname", "oobp", "oslg", "oavg"] if col in df.columns])
@@ -71,6 +121,7 @@ def clean_pitching_df(df):
     return df[[col for col in order if col in df.columns] + [col for col in df.columns if col not in order]]
 
 def clean_fielding_df(df):
+    """Clean and structure fielding stats DataFrame."""
     if "teamname" in df.columns:
         df["teamname"] = df["teamname"].apply(lambda x: x.get("$t") if isinstance(x, dict) else x)
     df = df.drop(columns=[col for col in ["playerlinkid"] if col in df.columns])
@@ -84,7 +135,21 @@ def clean_fielding_df(df):
     order = ["PLAYER", "JERSEY", "TEAM", "FPCT", "GP", "PO", "A", "P"]
     return df[[col for col in order if col in df.columns] + [col for col in df.columns if col not in order]]
 
+# -----------------------
+# PDF Generation Function
+# -----------------------
+
 def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding_filters, pitching_filters):
+    """
+    Generate a PDF report of the filtered data tables.
+
+    Args:
+        batting_df (DataFrame), fielding_df (DataFrame), pitching_df (DataFrame): Cleaned stat data.
+        batting_filters, fielding_filters, pitching_filters: Tuple of (team, player, sort) for display.
+
+    Returns:
+        BytesIO: In-memory PDF document stream.
+    """
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=LETTER)
     elements = []
@@ -93,15 +158,18 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
     filter_style = ParagraphStyle(name="FilterStyle", parent=styles['Normal'], textColor=colors.HexColor("#c62127"), fontSize=8, alignment=1)
     date_style = ParagraphStyle(name="DateStyle", parent=styles['Normal'], textColor=colors.HexColor("#000c66"), fontSize=7, alignment=1)
 
+    # Add image if available
     if os.path.exists("WidgetHeader.png"):
         elements.append(Image("WidgetHeader.png", width=500, height=80))
         elements.append(Spacer(1, 12))
 
+    # Add current date and time
     now = datetime.now(ZoneInfo("America/New_York"))  
     report_date = now.strftime("Report Date: %B %d, %Y at %I:%M %p")
     elements.append(Paragraph(report_date, date_style))
     elements.append(Spacer(1, 24))
 
+    # Helper function to add a table section
     def add_title_and_table(title, df, filters):
         team, player, sort = filters
         elements.append(Paragraph(title, custom_title_style))
@@ -128,21 +196,28 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
     add_title_and_table("Fielding Stats", fielding_df, fielding_filters)
     add_title_and_table("Pitching Stats", pitching_df, pitching_filters)
     doc.build(elements)
-
     buffer.seek(0)
     return buffer
 
-# Load and clean data
+# --------------------
+# Data Load & Cleaning
+# --------------------
+
 batting_data = clean_batting_df(get_batting_stats(SEASON_ID))
 pitching_data = clean_pitching_df(get_pitching_stats(SEASON_ID))
 fielding_data = clean_fielding_df(get_fielding_stats(SEASON_ID))
 
-# UI setup
+# -----------------------
+# Streamlit UI Definition
+# -----------------------
+
+# Configure Streamlit page
 st.set_page_config(page_title="Baseball Performance Widget", layout="wide")
 PRIMARY_COLOR = "#c62127"
 SECONDARY_COLOR = "#000c66"
 TERTIARY_COLOR = "#0072eb"
 
+# Display app title and subtitle
 st.markdown(
     f"""
     <div style='background-color:{SECONDARY_COLOR}; padding:10px; border-radius:10px;'>
@@ -153,7 +228,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Sidebar layout
+# --------------------------
+# Sidebar Filters (3 columns)
+# --------------------------
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -174,7 +252,10 @@ with col3:
     pitching_player = st.selectbox("Select Player (Pitching)", ["All"] + sorted(pitching_data["PLAYER"].unique()))
     pitching_sort = st.selectbox("Sort By (Pitching)", ["None"] + [col for col in pitching_data.columns if pd.api.types.is_numeric_dtype(pitching_data[col])])
 
-# Apply filters
+# --------------------
+# Filter the datasets
+# --------------------
+
 batting_filtered = batting_data.copy()
 if batting_team != "All":
     batting_filtered = batting_filtered[batting_filtered["TEAM"] == batting_team]
@@ -199,13 +280,13 @@ if pitching_player != "All":
 if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
-# Format current date and time for filename
+# --------------------
+# Download PDF Report
+# --------------------
+
 now = datetime.now(ZoneInfo("America/New_York"))
 now_str = now.strftime("%Y-%m-%d_%H-%M")
 
-
-
-# Print and download PDF with timestamped filename
 st.download_button(
     label="🖨️ Generate and Download PDF",
     data=generate_pdf(
@@ -218,9 +299,10 @@ st.download_button(
     mime="application/pdf"
 )
 
+# ---------------------
+# Display Filtered Tables
+# ---------------------
 
-
-# Show filtered tables
 col1.dataframe(batting_filtered, use_container_width=True)
 col2.dataframe(fielding_filtered, use_container_width=True)
 col3.dataframe(pitching_filtered, use_container_width=True)
