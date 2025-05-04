@@ -198,7 +198,8 @@ if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
 # Format current date and time for filename
-now_str = datetime.now().strftime("%Y-%m-%d_%H-%M")
+now_str = datetime.now().strftime("%Y-%m-%d")
+
 
 # Print and download PDF with timestamped filename
 st.download_button(
