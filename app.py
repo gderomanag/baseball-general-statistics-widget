@@ -198,19 +198,17 @@ if pitching_sort != "None":
     pitching_filtered = pitching_filtered.sort_values(by=pitching_sort, ascending=False)
 
 # Print and generate PDF
-if st.button("🖨️ Generate PDF"):
-    pdf_buffer = generate_pdf(
+st.download_button(
+    label="🖨️ Generate and Download PDF",
+    data=generate_pdf(
         batting_filtered, fielding_filtered, pitching_filtered,
         batting_filters=(batting_team, batting_player, batting_sort),
         fielding_filters=(fielding_team, fielding_player, fielding_sort),
         pitching_filters=(pitching_team, pitching_player, pitching_sort)
-    )
-    st.download_button(
-        label="📥 Download PDF",
-        data=pdf_buffer,
-        file_name="stats_report.pdf",
-        mime="application/pdf"
-    )
+    ),
+    file_name="stats_report.pdf",
+    mime="application/pdf"
+)
 
 
 # Show filtered tables
