@@ -31,6 +31,10 @@ pip install -r requirements.txt
 To start the app locally:
 ```
 streamlit run app.py
+
+The Deployment Link is the following:
+https://baseball-general-statistics-widget.streamlit.app/
+
 ```
 
 Once running, your browser will open a local URL like http://localhost:8501/ where you can interact with the app.
