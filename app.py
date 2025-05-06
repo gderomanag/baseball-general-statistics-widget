@@ -20,6 +20,7 @@ Dependencies:
 # -------------------------
 
 # Core libraries
+
 import streamlit as st
 import pandas as pd
 import requests
@@ -46,15 +47,6 @@ SEASON_ID = 34102
 # -------------------
 
 def fetch(endpoint):
-    """
-    Fetch JSON data from the Pointstreak API.
-
-    Args:
-        endpoint (str): The API endpoint path.
-
-    Returns:
-        dict: JSON response parsed into Python dictionary.
-    """
     url = f"{BASE_URL}/{endpoint}"
     try:
         response = requests.get(url, headers=HEADERS)
@@ -66,6 +58,7 @@ def fetch(endpoint):
         else:
             print(f"Error fetching {url}: {e}")
         return {}
+
 
 # ---------------------------
 # Data Retrieval Functions
@@ -89,6 +82,7 @@ def get_fielding_stats(season_id):
                 player["position"] = position.get("position")
                 players.append(player)
     return pd.DataFrame(players)
+
 
 # ------------------------
 # Data Cleaning Functions
@@ -143,6 +137,7 @@ def clean_fielding_df(df):
 # PDF Generation Function
 # -----------------------
 
+
 def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding_filters, pitching_filters):
     """
     Generate a PDF report of the filtered data tables.
@@ -162,13 +157,13 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
     filter_style = ParagraphStyle(name="FilterStyle", parent=styles['Normal'], textColor=colors.HexColor("#c62127"), fontSize=8, alignment=1)
     date_style = ParagraphStyle(name="DateStyle", parent=styles['Normal'], textColor=colors.HexColor("#000c66"), fontSize=7, alignment=1)
 
-    # Add image if available
+    # Add header
     if os.path.exists("WidgetHeader.png"):
         elements.append(Image("WidgetHeader.png", width=500, height=80))
         elements.append(Spacer(1, 12))
 
     # Add current date and time
-    now = datetime.now(ZoneInfo("America/New_York"))  
+    now = datetime.now(ZoneInfo("America/New_York"))
     report_date = now.strftime("Report Date: %B %d, %Y at %I:%M %p")
     elements.append(Paragraph(report_date, date_style))
     elements.append(Spacer(1, 24))
@@ -181,7 +176,7 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
         filter_text = f"Filters: Team = {team}, Player = {player}, Sort = {sort}"
         elements.append(Paragraph(filter_text, filter_style))
         elements.append(Spacer(1, 12))
-        data = [df.columns.tolist()] + df.head(10).values.tolist()
+        data = [df.columns.tolist()] + df.values.tolist()
         data = [[str(cell) for cell in row] for row in data]
         table = Table(data, repeatRows=1)
         table.setStyle(TableStyle([
@@ -189,8 +184,8 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
             ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
         ]))
         elements.append(table)
@@ -199,9 +194,11 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
     add_title_and_table("Batting Stats", batting_df, batting_filters)
     add_title_and_table("Fielding Stats", fielding_df, fielding_filters)
     add_title_and_table("Pitching Stats", pitching_df, pitching_filters)
+
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
 
 # --------------------
 # Data Load & Cleaning
