@@ -268,6 +268,8 @@ if batting_team != "All":
     batting_filtered = batting_filtered[batting_filtered["TEAM"] == batting_team]
 if batting_player != "All":
     batting_filtered = batting_filtered[batting_filtered["PLAYER"] == batting_player]
+if batting_position != "All":
+    batting_filtered = batting_filtered[batting_filtered["P"] == batting_position]
 if batting_sort != "None":
     batting_filtered = batting_filtered.sort_values(by=batting_sort, ascending=False)
 
@@ -276,6 +278,8 @@ if fielding_team != "All":
     fielding_filtered = fielding_filtered[fielding_filtered["TEAM"] == fielding_team]
 if fielding_player != "All":
     fielding_filtered = fielding_filtered[fielding_filtered["PLAYER"] == fielding_player]
+if fielding_position != "All":
+    fielding_filtered = fielding_filtered[fielding_filtered["P"] == fielding_position]
 if fielding_sort != "None":
     fielding_filtered = fielding_filtered.sort_values(by=fielding_sort, ascending=False)
 
