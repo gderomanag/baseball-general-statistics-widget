@@ -4,7 +4,7 @@ This repository contains all the code, documentation, and instructions necessary
 
 ## Repository Structure
 .
-├── app.py                  # Main Streamlit app
+├── widget.py               # Main Streamlit app
 ├── requirements.txt        # List of required Python packages
 ├── WidgetHeader.png        # Header image used in PDF reports (optional)
 ├── README                  # Documentation and usage instructions
