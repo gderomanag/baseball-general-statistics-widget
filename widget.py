@@ -181,14 +181,17 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
         data = [[str(cell) for cell in row] for row in data]
         table = Table(data, repeatRows=1)
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0072eb")),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ]))
+    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0072eb")),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('FONTNAME', (1, 1), (-1, -1), 'Helvetica'),
+    ('FONTSIZE', (0, 0), (-1, 0), 9),     # header row
+    ('FONTSIZE', (1, 1), (-1, -1), 8),    # table body
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+    ('BOTTOMPADDING', (1, 1), (-1, -1), 6),
+    ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+]))
         elements.append(table)
         elements.append(Spacer(1, 24))
 
