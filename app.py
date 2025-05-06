@@ -39,7 +39,7 @@ from zoneinfo import ZoneInfo
 API_KEY = "KEY"
 BASE_URL = "https://api.pointstreak.com"
 HEADERS = {"apikey": API_KEY}
-SEASON_ID = 34052
+SEASON_ID = 34102
 
 # -------------------
 # API Fetch Function
