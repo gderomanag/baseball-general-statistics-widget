@@ -243,12 +243,14 @@ with col1:
     st.subheader("Batting Stats")
     batting_team = st.selectbox("Select Team (Batting)", ["All"] + sorted(batting_data["TEAM"].unique()))
     batting_player = st.selectbox("Select Player (Batting)", ["All"] + sorted(batting_data["PLAYER"].unique()))
+    batting_position = st.selectbox("Select Position (Batting)", ["All"] + sorted(batting_data["P"].dropna().unique()))
     batting_sort = st.selectbox("Sort By (Batting)", ["None"] + [col for col in batting_data.columns if pd.api.types.is_numeric_dtype(batting_data[col])])
 
 with col2:
     st.subheader("Fielding Stats")
     fielding_team = st.selectbox("Select Team (Fielding)", ["All"] + sorted(fielding_data["TEAM"].unique()))
     fielding_player = st.selectbox("Select Player (Fielding)", ["All"] + sorted(fielding_data["PLAYER"].unique()))
+    fielding_position = st.selectbox("Select Position (Fielding)", ["All"] + sorted(fielding_data["P"].dropna().unique()))
     fielding_sort = st.selectbox("Sort By (Fielding)", ["None"] + [col for col in fielding_data.columns if pd.api.types.is_numeric_dtype(fielding_data[col])])
 
 with col3:
