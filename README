@@ -33,7 +33,7 @@ To start the app locally:
 streamlit run app.py
 
 The Deployment Link is the following:
-https://baseball-general-statistics-widget.streamlit.app/
+https://baseball-general-statistics-widget-alpb.streamlit.app/
 
 ```
 
