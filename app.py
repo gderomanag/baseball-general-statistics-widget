@@ -56,26 +56,30 @@ def fetch(endpoint):
         dict: JSON response parsed into Python dictionary.
     """
     url = f"{BASE_URL}/{endpoint}"
-    response = requests.get(url, headers=HEADERS)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(url, headers=HEADERS)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 404:
+            print(f"404 Not Found: {url}")
+        else:
+            print(f"Error fetching {url}: {e}")
+        return {}
 
 # ---------------------------
 # Data Retrieval Functions
 # ---------------------------
 
 def get_batting_stats(season_id):
-    """Fetch and return raw batting stats as a DataFrame."""
     data = fetch(f"baseball/season/stats/{season_id}/json")
     return pd.DataFrame(data.get("stats", {}).get("batting", {}).get("player", []))
 
 def get_pitching_stats(season_id):
-    """Fetch and return raw pitching stats as a DataFrame."""
     data = fetch(f"baseball/season/stats/{season_id}/json")
     return pd.DataFrame(data.get("stats", {}).get("pitching", {}).get("player", []))
 
 def get_fielding_stats(season_id):
-    """Fetch and return raw fielding stats as a DataFrame."""
     data = fetch(f"baseball/season/fieldingleaders/{season_id}/json")
     players = []
     for position in data.get("stats", {}).get("position", []):
