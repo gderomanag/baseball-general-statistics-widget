@@ -97,7 +97,7 @@ def clean_batting_df(df):
     rename_map = {"playername": "PLAYER", "teamname": "TEAM", "jersey": "JERSEY", "position": "P"}
     df = df.rename(columns=rename_map)
     df.columns = [rename_map.get(col, col.upper()) for col in df.columns]
-    numeric_cols = ["AVG", "AB", "RUNS", "HITS", "HR", "RBI", "BB", "HP", "SO", "SF", "SB", "DP", "BIB", "TRIP", "OBP", "SLG"]
+    numeric_cols = ["AVG", "AB", "RUNS", "HITS", "HR", "RBI", "BB", "HP", "SO", "SF", "SB", "DP", "BIB", "TRIB", "OBP", "SLG"]
     for col in numeric_cols:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
