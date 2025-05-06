@@ -175,6 +175,10 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
         elements.append(Paragraph(title, custom_title_style))
         elements.append(Spacer(1, 6))
         filter_text = f"Filters: Team = {team}, Player = {player}, Sort = {sort}"
+        if title.startswith("Batting") and batting_position:
+            filter_text += f", Position = {batting_position}"
+        elif title.startswith("Fielding") and fielding_position:
+            filter_text += f", Position = {fielding_position}"
         elements.append(Paragraph(filter_text, filter_style))
         elements.append(Spacer(1, 12))
         data = [df.columns.tolist()] + df.values.tolist()
