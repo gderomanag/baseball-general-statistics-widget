@@ -262,7 +262,7 @@ with col3:
     pitching_team = st.selectbox("Select Team (Pitching)", ["All"] + sorted(pitching_data["TEAM"].unique()))
     pitching_player = st.selectbox("Select Player (Pitching)", ["All"] + sorted(pitching_data["PLAYER"].unique()))
     pitching_sort = st.selectbox("Sort By (Pitching)", ["None"] + [col for col in pitching_data.columns if pd.api.types.is_numeric_dtype(pitching_data[col])])
-    st.markdown("<div style='height: 38px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
 
 # --------------------
 # Filter the datasets
