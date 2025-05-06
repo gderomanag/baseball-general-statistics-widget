@@ -29,6 +29,7 @@ from reportlab.lib.pagesizes import LETTER
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import LETTER, landscape
 import os
 from io import BytesIO
 from zoneinfo import ZoneInfo
@@ -150,7 +151,7 @@ def generate_pdf(batting_df, fielding_df, pitching_df, batting_filters, fielding
         BytesIO: In-memory PDF document stream.
     """
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=LETTER)
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(LETTER))
     elements = []
     styles = getSampleStyleSheet()
     custom_title_style = ParagraphStyle(name="CustomTitle", parent=styles['Title'], textColor=colors.HexColor("#000c66"), fontSize=14, alignment=1)
