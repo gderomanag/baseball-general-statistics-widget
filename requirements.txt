@@ -4,3 +4,4 @@ requests
 reportlab
 matplotlib
 seaborn
+python-dotenv
