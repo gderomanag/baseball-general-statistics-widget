@@ -42,7 +42,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get API key from environment
-API_KEY = os.getenv("API_KEY")
+if os.path.exists(".env"):
+    load_dotenv()
+    API_KEY = os.getenv("API_KEY")
+else:
+    API_KEY = st.secrets["API_KEY"]
+    
 BASE_URL = "https://api.pointstreak.com"
 HEADERS = {"apikey": API_KEY}
 SEASON_ID = 34102
