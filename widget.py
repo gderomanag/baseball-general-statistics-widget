@@ -33,12 +33,16 @@ from reportlab.lib.pagesizes import LETTER, landscape
 import os
 from io import BytesIO
 from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
 
 # -------------------
 # Pointstreak API Setup
 # -------------------
 
-API_KEY = "KEY"
+load_dotenv()
+
+# Get API key from environment
+API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.pointstreak.com"
 HEADERS = {"apikey": API_KEY}
 SEASON_ID = 34102
